@@ -2,8 +2,8 @@ import css from './App.module.css';
 import { fetchMovie } from '../../services/movieService';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { Movie } from '../../types/movie';
-import { useState } from 'react';
-import { Toaster } from 'react-hot-toast';
+import { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 
 import Pagination from '../Pagination/Pagination';
 import SearchBar from '../SearchBar/SearchBar';
@@ -21,11 +21,18 @@ function App() {
     enabled: search !== '',
     placeholderData: keepPreviousData,
   });
+  useEffect(() => {
+    if (!isError && data && data.total_results === 0) {
+      toast.error('No movies found for your request.');
+    }
+  });
+
   const totalPages = data?.total_pages ?? 0;
   const handleSearch = (query: string) => {
     const trimmedQuery = query.trim();
     if (trimmedQuery !== '') {
       setSearch(trimmedQuery);
+      setCurrentPage(1);
     }
   };
   const handlePage = (newPage: number) => setCurrentPage(newPage);
@@ -35,8 +42,8 @@ function App() {
       <SearchBar onSubmit={handleSearch} />
       {!isLoading && !isError && data && totalPages > 1 && (
         <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
+          pageCount={totalPages}
+          forcePage={currentPage}
           onPageChange={handlePage}
         />
       )}
