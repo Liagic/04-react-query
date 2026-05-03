@@ -15,7 +15,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
   const [openModal, setOpenModal] = useState<Movie | null>(null);
-  const { data, error, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['movies', search, currentPage],
     queryFn: () => fetchMovie(search, currentPage),
     enabled: search !== '',
@@ -28,28 +28,24 @@ function App() {
       setSearch(trimmedQuery);
     }
   };
-  const handlePage = newPage  => setCurrentPage(newPage);
+  const handlePage = newPage => setCurrentPage(newPage);
 
   return (
     <div className={css.app}>
       <SearchBar onSubmit={handleSearch} />
-      {!isLoading &&
-        !isError &&
-        (data ? (data.total_pages > 1 ? true : false) : false) && (
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={handlePage}
-          />
-        )}
+      {!isLoading && !isError && data && totalPages > 1 && (
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={handlePage}
+        />
+      )}
 
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-      {!isLoading &&
-        !isError &&
-        (data ? (data.total_results > 0 ? true : false) : false) && (
-          <MovieGrid movies={data.results} onSelect={setOpenModal} />
-        )}
+      {!isLoading && !isError && data && data.total_results > 0 && (
+        <MovieGrid movies={data.results} onSelect={setOpenModal} />
+      )}
       {openModal && (
         <MovieModal onClose={() => setOpenModal(null)} movie={openModal} />
       )}
