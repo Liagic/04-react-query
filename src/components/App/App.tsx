@@ -28,7 +28,7 @@ function App() {
       setSearch(trimmedQuery);
     }
   };
-  const handlePage = newPage => setCurrentPage(newPage);
+  const handlePage = (newPage: number) => setCurrentPage(newPage);
 
   return (
     <div className={css.app}>
