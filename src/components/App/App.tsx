@@ -15,17 +15,17 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
   const [openModal, setOpenModal] = useState<Movie | null>(null);
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ['movies', search, currentPage],
     queryFn: () => fetchMovie(search, currentPage),
     enabled: search !== '',
     placeholderData: keepPreviousData,
   });
   useEffect(() => {
-    if (!isError && data && data.total_results === 0) {
+    if (isSuccess && data?.total_results === 0) {
       toast.error('No movies found for your request.');
     }
-  });
+  }, [isSuccess, data]);
 
   const totalPages = data?.total_pages ?? 0;
   const handleSearch = (query: string) => {
